@@ -45,7 +45,7 @@ import { CHARACTERS, ASSISTANT_DIALOGS } from '../../data/characters';
 // 사무실 업그레이드 비용 계산 함수
 const getUpgradeCost = (currentLevel: number): number => {
   // 매우 높은 기본 비용으로 시작하여 급격하게 증가
-  const baseCosts = {
+  const baseCosts: Record<number, number> = {
     1: 1000000,    // 레벨 1→2: 100만원
     2: 3000000,    // 레벨 2→3: 300만원 
     3: 7500000,    // 레벨 3→4: 750만원

@@ -39,22 +39,15 @@ import { CHARACTERS, ASSISTANT_DIALOGS } from '../../data/characters';
 
 // 사무실 업그레이드 비용 계산 함수
 const getUpgradeCost = (currentLevel: number): number => {
-  const baseCost = 10000; // 기본 비용
-  return baseCost * Math.pow(3, currentLevel - 1); // 지수적으로 증가
-};
-
-// 사무실 업그레이드에 필요한 유저 레벨 계산 함수
-const getRequiredUserLevel = (targetOfficeLevel: number): number => {
-  // 사무실 레벨별 필요 유저 레벨
-  const levelRequirements = {
-    1: 1,  // 레벨 1 사무실은 유저 레벨 1 필요
-    2: 3,  // 레벨 2 사무실은 유저 레벨 3 필요
-    3: 6,  // 레벨 3 사무실은 유저 레벨 6 필요
-    4: 9,  // 레벨 4 사무실은 유저 레벨 9 필요
-    5: 12  // 레벨 5 사무실은 유저 레벨 12 필요
+  // 훨씬 높은 기본 비용으로 시작하며 더 빠르게 증가
+  const baseCosts = {
+    1: 300000,    // 레벨 1→2: 30만원
+    2: 750000,    // 레벨 2→3: 75만원 
+    3: 1500000,   // 레벨 3→4: 150만원
+    4: 3000000    // 레벨 4→5: 300만원
   };
   
-  return levelRequirements[targetOfficeLevel as keyof typeof levelRequirements] || 15;
+  return baseCosts[currentLevel] || 5000000; // 기본값으로 500만원
 };
 
 const OfficeScreen: React.FC = () => {
@@ -232,7 +225,7 @@ const OfficeScreen: React.FC = () => {
                     borderRadius: 2, 
                     border: '1px solid', 
                     borderColor: 'divider',
-                    mb: 'auto'  // 남은 공간 채우기
+                    mb: 2
                   }}>
                     <Typography variant="body2" sx={{ fontSize: '0.9rem', fontWeight: 500, mb: 1 }}>
                       현재 혜택:
@@ -246,6 +239,32 @@ const OfficeScreen: React.FC = () => {
                       사무실 평판 +{currentOffice.level * 10}%
                     </Typography>
                   </Box>
+                  
+                  {/* 업그레이드 비용 정보 */}
+                  {currentOffice.level < 5 && (
+                    <Box sx={{ 
+                      py: 1.5, 
+                      px: 2, 
+                      bgcolor: 'grey.50', 
+                      borderRadius: 2, 
+                      borderLeft: '3px solid', 
+                      borderColor: 'primary.main',
+                      mb: 'auto'
+                    }}>
+                      <Typography variant="body2" sx={{ fontSize: '0.9rem', fontWeight: 500, mb: 1, color: 'text.primary' }}>
+                        업그레이드 비용:
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Typography variant="h6" sx={{ 
+                          fontSize: '1.1rem', 
+                          color: user.money >= getUpgradeCost(currentOffice.level) ? 'success.main' : 'error.main', 
+                          fontWeight: 'bold'
+                        }}>
+                          {getUpgradeCost(currentOffice.level).toLocaleString()}원
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
                 </Box>
                 
                 {/* 카드 푸터 - 항상 하단에 고정 */}
@@ -265,17 +284,14 @@ const OfficeScreen: React.FC = () => {
                     <Button
                       variant="contained"
                       size="medium"
-                      disabled={
-                        user.money < getUpgradeCost(currentOffice.level) || 
-                        user.level < getRequiredUserLevel(currentOffice.level + 1)
-                      }
+                      disabled={user.money < getUpgradeCost(currentOffice.level)}
                       fullWidth
                       onClick={() => {
                         // 업그레이드 비용 계산
                         const upgradeCost = getUpgradeCost(currentOffice.level);
                         
                         // 충분한 돈이 있는지 확인
-                        if (user.money >= upgradeCost && user.level >= getRequiredUserLevel(currentOffice.level + 1)) {
+                        if (user.money >= upgradeCost) {
                           // 비용 지불
                           addMoney(-upgradeCost);
                           // 사무실 업그레이드
@@ -297,7 +313,7 @@ const OfficeScreen: React.FC = () => {
                   {currentOffice.level < 5 && (
                     <Box sx={{ mt: 1, textAlign: 'center' }}>
                       <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                        필요: Lv.{getRequiredUserLevel(currentOffice.level + 1)}, {getUpgradeCost(currentOffice.level).toLocaleString()}원
+                        필요 자금: {getUpgradeCost(currentOffice.level).toLocaleString()}원
                       </Typography>
                     </Box>
                   )}

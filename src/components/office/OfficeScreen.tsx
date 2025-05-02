@@ -21,7 +21,12 @@ import {
   Alert,
   LinearProgress,
   Collapse,
-  Snackbar
+  Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -56,6 +61,8 @@ const OfficeScreen: React.FC = () => {
   const [assistantMessage, setAssistantMessage] = useState('');
   // 알림 상태
   const [upgradeSnackbar, setUpgradeSnackbar] = useState(false);
+  // 로그아웃 확인 팝업 상태
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   // 컴포넌트 마운트시 방문 횟수 증가
   useEffect(() => {
@@ -121,7 +128,7 @@ const OfficeScreen: React.FC = () => {
           <Button 
             color="inherit" 
             variant="outlined" 
-            onClick={resetGame}
+            onClick={() => setLogoutDialogOpen(true)}
             sx={{ 
               fontSize: '0.8rem',
               borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -551,6 +558,32 @@ const OfficeScreen: React.FC = () => {
           }
         }}
       />
+      
+      {/* 로그아웃 확인 다이얼로그 */}
+      <Dialog
+        open={logoutDialogOpen}
+        onClose={() => setLogoutDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"로그아웃 확인"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            로그아웃하면 현재 진행 중인 내용이 모두 사라집니다. 
+            정말 로그아웃 하시겠습니까?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLogoutDialogOpen(false)} color="primary">
+            취소
+          </Button>
+          <Button onClick={resetGame} color="error" autoFocus>
+            로그아웃
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -224,219 +224,444 @@ const MissionSelectScreen: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* 미션 목록 */}
-      <Box sx={{ flexGrow: 1, p: { xs: 1.5, md: 2 }, bgcolor: '#f5f8fa', overflowY: 'auto', position: 'relative' }}>
-        {/* 비서 캐릭터 대화창 - 항상 표시 */}
+      {/* 미션 목록 컨테이너 */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        flexGrow: 1, 
+        bgcolor: '#f5f8fa', 
+        position: 'relative',
+        overflow: 'hidden' // 전체 컨테이너의 오버플로우 제어
+      }}>
+        {/* 미션 목록 - 스크롤 가능 영역 */}
         <Box sx={{ 
-          position: 'absolute', 
-          bottom: 20, 
-          right: 20, 
-          zIndex: 10, 
-          maxWidth: '450px',
-          width: '100%'
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: 'calc(100% - 56px)', // 상단 AppBar 높이 제외
+          overflow: 'hidden' // 이 컨테이너에서 오버플로우 숨김
         }}>
-          <CharacterDialog
-            character={{...CHARACTERS.ASSISTANT, position: 'right'}}
-            message={assistantMessage}
-            showContinueButton={false}
-          />
-        </Box>
-        
-        <Container maxWidth={false} disableGutters sx={{ px: { xs: 1, md: 2 }, width: '100%' }}>
-          <Typography variant="h5" sx={{ fontSize: '1.25rem', mb: 1 }}>
-            이용 가능한 의뢰
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem', mb: 1.5 }}>
-            아래 의뢰 중 하나를 선택하여 분석을 시작하세요. 의뢰의 난이도와 보상을 확인하고 적절한 의뢰를 선택하는 것이 중요합니다.
-          </Typography>
-          
-          <Divider sx={{ mb: 2 }} />
-          
-          <Grid container spacing={3} sx={{ width: '100%', mx: 0 }}>
-            {availableMissions.map((mission) => {
-              const difficultyInfo = getDifficultyInfo(mission.difficulty);
+          <Box sx={{ 
+            bgcolor: 'background.paper',
+            borderBottom: '1px solid',
+            borderColor: 'primary.main',
+            flexShrink: 0, // 헤더가 축소되지 않도록 설정
+            py: { xs: 1.5, md: 2 },
+            px: { xs: 2, md: 3 },
+            boxShadow: '0 1px 6px rgba(0, 0, 0, 0.05)'
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              maxWidth: '1400px', 
+              mx: 'auto',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: { xs: 3, md: 0 }
+            }}>
+              <Box sx={{ 
+                textAlign: { xs: 'center', md: 'left' },
+                width: { xs: '100%', md: 'auto' }
+              }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontSize: { xs: '1.2rem', md: '1.4rem' }, 
+                    mb: 1.5,
+                    fontWeight: 'bold',
+                    color: 'primary.main',
+                    display: 'inline-block'
+                  }}
+                >
+                  이용 가능한 의뢰
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    fontSize: '0.85rem', 
+                    maxWidth: '600px',
+                    lineHeight: 1.5,
+                    mt: 1
+                  }}
+                >
+                  아래 의뢰 중 하나를 선택하여 재무 분석을 시작하세요.
+                </Typography>
+              </Box>
               
-              return (
-                <Grid item xs={12} md={6} lg={6} key={mission.id}>
-                  <Card sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0, 0, 0, 0.05)',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
-                      borderColor: 'rgba(0, 0, 0, 0.1)'
-                    }
-                  }}>
-                    <CardContent sx={{ 
-                      flexGrow: 1,
-                      p: 0,
+              {/* 비서 캐릭터 대화창 - 오른쪽에 배치 */}
+              <Box sx={{ 
+                width: { xs: '100%', md: '450px' },
+                maxWidth: { xs: '500px', md: '450px' },
+                flexShrink: 0,
+                ml: { xs: 0, md: 3 },
+                mx: { xs: 'auto', md: 0 },
+                display: { xs: 'none', md: 'block' } // 모바일에서는 숨김
+              }}>
+                <CharacterDialog
+                  character={{...CHARACTERS.ASSISTANT, position: 'right'}}
+                  message={assistantMessage}
+                  showContinueButton={false}
+                />
+              </Box>
+            </Box>
+          </Box>
+          
+          {/* 스크롤 가능한 미션 카드 영역 */}
+          <Box sx={{ 
+            flexGrow: 1, 
+            overflowY: 'auto', // 이 영역에만 스크롤 적용
+            p: { xs: 2, md: 4 },
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: '#f9f9fb', // 배경색 변경
+            backgroundImage: 'linear-gradient(to bottom, rgba(65, 105, 225, 0.03), rgba(65, 105, 225, 0.01))'
+          }}>
+            <Container maxWidth={false} disableGutters sx={{ 
+              px: { xs: 1, md: 2 }, 
+              width: '100%', 
+              maxWidth: '1400px', 
+              height: '100%', // 컨테이너 높이 100% 설정
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              {/* 모바일에서만 표시되는 비서 */}
+              <Box sx={{ 
+                width: '100%', 
+                mb: 3,
+                maxWidth: '500px',
+                mx: 'auto',
+                display: { xs: 'block', md: 'none' }, // 모바일에서만 표시
+                flexShrink: 0, // 크기 고정
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                borderRadius: 2,
+                overflow: 'hidden'
+              }}>
+                <CharacterDialog
+                  character={{...CHARACTERS.ASSISTANT, position: 'right'}}
+                  message={assistantMessage}
+                  showContinueButton={false}
+                />
+              </Box>
+              
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                mb: 3, 
+                flexShrink: 0,
+                px: { xs: 1, md: 2 }
+              }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 'medium', 
+                    color: 'text.primary',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  <AssignmentIcon sx={{ color: 'primary.main' }} />
+                  선택 가능한 의뢰 목록
+                </Typography>
+                
+                <Chip 
+                  label={`${availableMissions.length}개의 의뢰`} 
+                  color="primary" 
+                  variant="outlined" 
+                  size="small"
+                  sx={{ 
+                    fontWeight: 'medium',
+                    fontSize: '0.8rem',
+                    borderRadius: '16px',
+                    px: 1
+                  }}
+                />
+              </Box>
+              
+              <Grid container spacing={3} sx={{ 
+                width: '100%', 
+                mx: 0, 
+                pb: 4, // 하단 여백 추가
+                flexGrow: 1, 
+                minHeight: 0, // flexbox 내부에서 스크롤이 작동하기 위한 설정
+                alignContent: 'flex-start' // 컨텐츠를 위에서부터 배치
+              }}>
+              {availableMissions.map((mission) => {
+                const difficultyInfo = getDifficultyInfo(mission.difficulty);
+                
+                return (
+                  <Grid item xs={12} md={6} lg={6} key={mission.id}>
+                    <Card sx={{ 
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      transition: 'all 0.3s ease',
+                      border: '1px solid rgba(0, 0, 0, 0.05)',
+                      overflow: 'hidden',
+                      borderRadius: 3,
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.06)',
+                      position: 'relative',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, primary.main, primary.light)',
+                        opacity: 0,
+                        transition: 'opacity 0.3s ease'
+                      },
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.12)',
+                        borderColor: 'primary.main',
+                        '&::before': {
+                          opacity: 1
+                        }
+                      }
                     }}>
-                      {/* 카드 헤더 부분 - 배경색 있는 타이틀과 태그 */}
-                      <Box sx={{ 
-                        bgcolor: 'primary.main', 
-                        px: 3, 
-                        py: 2, 
-                        color: 'white',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                      <CardContent sx={{ 
+                        flexGrow: 1,
+                        p: 0,
                       }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-                            {mission.title}
-                          </Typography>
-                          <Chip 
-                            size="small"
-                            label={getMissionTypeLabel(mission.type)}
-                            sx={{ 
-                              bgcolor: 'rgba(255, 255, 255, 0.25)', 
-                              color: 'white',
-                              fontWeight: 500,
-                              fontSize: '0.8rem',
-                              height: '24px'
-                            }}
-                          />
-                        </Box>
-                      </Box>
-
-                      {/* 카드 본문 내용 */}
-                      <Box sx={{ p: 3 }}>
-                        {/* 클라이언트 및 난이도 정보 - 윗줄 */}
+                        {/* 카드 헤더 부분 - 배경색 있는 타이틀과 태그 */}
                         <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'space-between',
-                          mb: 2,
-                          pb: 1.5,
-                          borderBottom: '1px solid rgba(0, 0, 0, 0.08)'
+                          background: 'linear-gradient(135deg, #000000, #333333)',
+                          px: 3, 
+                          py: 2.5, 
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                          position: 'relative',
+                          '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '6px',
+                            background: 'linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0))'
+                          }
                         }}>
-                          {/* 클라이언트 정보 */}
-                          {(() => {
-                            const client = clients.find(c => c.id === mission.clientId);
-                            if (client) {
-                              const typeInfo = getClientTypeInfo(client.type);
-                              return (
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                  <Avatar 
-                                    sx={{ 
-                                      bgcolor: `${typeInfo.color}.main`, 
-                                      width: 28, 
-                                      height: 28, 
-                                      mr: 1.5 
-                                    }}
-                                  >
-                                    {typeInfo.icon}
-                                  </Avatar>
-                                  <Typography variant="body2" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                                    {client.name}
-                                  </Typography>
-                                </Box>
-                              );
-                            }
-                            return null;
-                          })()}
-                          
-                          {/* 난이도 정보 */}
-                          <Chip 
-                            size="small"
-                            label={difficultyInfo.label}
-                            sx={{ 
-                              bgcolor: difficultyInfo.color,
-                              color: 'white',
-                              height: 24,
-                              fontSize: '0.75rem',
-                              fontWeight: 'bold'
-                            }}
-                          />
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="h6" component="div" sx={{ 
+                              fontWeight: 'bold', 
+                              fontSize: '1.2rem',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                              color: 'white'
+                            }}>
+                              {mission.title}
+                            </Typography>
+                            <Chip 
+                              size="small"
+                              label={getMissionTypeLabel(mission.type)}
+                              sx={{ 
+                                bgcolor: 'rgba(255, 255, 255, 0.25)', 
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: '0.75rem',
+                                height: '26px',
+                                borderRadius: '13px',
+                                border: '1px solid rgba(255,255,255,0.3)',
+                                backdropFilter: 'blur(4px)'
+                              }}
+                            />
+                          </Box>
                         </Box>
-                        
-                        {/* 미션 설명 */}
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary" 
+
+                        {/* 카드 본문 내용 */}
+                        <Box sx={{ p: 3 }}>
+                          {/* 클라이언트 및 난이도 정보 - 윗줄 */}
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'space-between',
+                            mb: 2.5,
+                            pb: 2,
+                            borderBottom: '1px solid rgba(0, 0, 0, 0.06)'
+                          }}>
+                            {/* 클라이언트 정보 */}
+                            {(() => {
+                              const client = clients.find(c => c.id === mission.clientId);
+                              if (client) {
+                                const typeInfo = getClientTypeInfo(client.type);
+                                return (
+                                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar 
+                                      sx={{ 
+                                        bgcolor: `${typeInfo.color}.main`, 
+                                        width: 32, 
+                                        height: 32, 
+                                        mr: 1.5,
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                      }}
+                                    >
+                                      {typeInfo.icon}
+                                    </Avatar>
+                                    <Box>
+                                      <Typography variant="body2" sx={{ 
+                                        fontSize: '0.95rem', 
+                                        fontWeight: 'bold',
+                                        color: 'text.primary'
+                                      }}>
+                                        {client.name}
+                                      </Typography>
+                                      <Typography variant="caption" sx={{ 
+                                        fontSize: '0.75rem',
+                                        color: 'text.secondary',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                      }}>
+                                        {typeInfo.label}
+                                      </Typography>
+                                    </Box>
+                                  </Box>
+                                );
+                              }
+                              return null;
+                            })()}
+                            
+                            {/* 난이도 정보 */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                              <Chip 
+                                size="small"
+                                label={difficultyInfo.label}
+                                sx={{ 
+                                  bgcolor: difficultyInfo.color,
+                                  color: 'white',
+                                  height: 24,
+                                  fontSize: '0.75rem',
+                                  fontWeight: 'bold',
+                                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                }}
+                              />
+                              <Rating 
+                                value={difficultyInfo.stars} 
+                                readOnly 
+                                size="small"
+                                sx={{ 
+                                  mt: 0.5,
+                                  fontSize: '0.7rem',
+                                  color: difficultyInfo.color
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                          
+                          {/* 미션 설명 */}
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary" 
+                            sx={{ 
+                              fontSize: '0.9rem',
+                              lineHeight: 1.7,
+                              minHeight: '4.8em',
+                              mb: 2.5,
+                              borderLeft: '3px solid',
+                              borderLeftColor: 'primary.light',
+                              pl: 1.5,
+                              py: 0.5
+                            }}
+                          >
+                            {mission.description}
+                          </Typography>
+                          
+                          {/* 보상 정보 */}
+                          <Box sx={{ 
+                            display: 'flex', 
+                            pt: 2,
+                            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <Box sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center',
+                              bgcolor: '#e6f7e6',
+                              border: '1px solid #2e7d32',
+                              color: '#2e7d32',
+                              py: 0.75,
+                              px: 2,
+                              borderRadius: 2
+                            }}>
+                              <MonetizationOnIcon sx={{ fontSize: '1.2rem', mr: 0.75, color: '#2e7d32' }} />
+                              <Typography variant="body1" sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
+                                {mission.reward.money.toLocaleString()}원
+                              </Typography>
+                            </Box>
+                            <Box sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center',
+                              bgcolor: '#e3f2fd',
+                              border: '1px solid #1976d2',
+                              color: '#1976d2',
+                              py: 0.75,
+                              px: 2,
+                              borderRadius: 2
+                            }}>
+                              <WorkspacePremiumIcon sx={{ fontSize: '1.2rem', mr: 0.75, color: '#1976d2' }} />
+                              <Typography variant="body1" sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
+                                {mission.reward.experience} XP
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                      <CardActions sx={{ p: 0, mt: 'auto' }}>
+                        <Button 
+                          variant="contained"
+                          fullWidth
+                          onClick={() => handleMissionSelect(mission.id)}
                           sx={{ 
-                            fontSize: '0.9rem',
-                            lineHeight: 1.6,
-                            minHeight: '4.8em',
-                            mb: 1.5
+                            borderRadius: '0 0 8px 8px',
+                            py: 1.75,
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            boxShadow: 'none',
+                            background: 'linear-gradient(90deg, primary.main, primary.dark)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                              filter: 'brightness(110%)'
+                            }
                           }}
                         >
-                          {mission.description}
-                        </Typography>
-                        
-                        {/* 보상 정보 */}
-                        <Box sx={{ 
-                          display: 'flex', 
-                          pt: 1.5,
-                          borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-                          justifyContent: 'space-between'
-                        }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <MonetizationOnIcon sx={{ fontSize: '1.2rem', mr: 0.5, color: 'success.main' }} />
-                            <Typography variant="body2" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                              {mission.reward.money.toLocaleString()}원
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <WorkspacePremiumIcon sx={{ fontSize: '1.2rem', mr: 0.5, color: 'primary.main' }} />
-                            <Typography variant="body2" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                              {mission.reward.experience} XP
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                    <CardActions sx={{ p: 0 }}>
-                      <Button 
-                        variant="contained"
-                        fullWidth
-                        onClick={() => handleMissionSelect(mission.id)}
-                        sx={{ 
-                          borderRadius: 0,
-                          py: 1.5,
-                          fontSize: '1rem',
-                          fontWeight: 600,
-                          boxShadow: 'none',
-                          '&:hover': {
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                          }
-                        }}
-                      >
-                        의뢰 상세보기
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
-          
-          {availableMissions.length === 0 && (
-            <Box sx={{ 
-              py: 10, 
-              textAlign: 'center',
-              border: '1px dashed',
-              borderColor: 'divider',
-              borderRadius: 2
-            }}>
-              <Typography variant="h6" color="text.secondary">
-                현재 이용 가능한 의뢰가 없습니다.
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                레벨을 올리거나 다른 클라이언트를 선택해보세요.
-              </Typography>
-              <Button 
-                variant="outlined" 
-                sx={{ mt: 2 }}
-                onClick={() => setGamePhase(GamePhase.OFFICE)}
-              >
-                사무실로 돌아가기
-              </Button>
-            </Box>
-          )}
-        </Container>
+                          의뢰 상세보기
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            
+            {availableMissions.length === 0 && (
+              <Box sx={{ 
+                py: 10, 
+                textAlign: 'center',
+                border: '1px dashed',
+                borderColor: 'divider',
+                borderRadius: 2
+              }}>
+                <Typography variant="h6" color="text.secondary">
+                  현재 이용 가능한 의뢰가 없습니다.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  레벨을 올리거나 다른 클라이언트를 선택해보세요.
+                </Typography>
+                <Button 
+                  variant="outlined" 
+                  sx={{ mt: 2 }}
+                  onClick={() => setGamePhase(GamePhase.OFFICE)}
+                >
+                  사무실로 돌아가기
+                </Button>
+              </Box>
+            )}
+            </Container>
+          </Box>
+        </Box>
       </Box>
 
       {/* 미션 상세 다이얼로그 */}

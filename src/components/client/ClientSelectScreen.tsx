@@ -103,14 +103,12 @@ const ClientSelectScreen: React.FC = () => {
       {/* 클라이언트 목록 */}
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#f5f8fa', overflowY: 'auto' }}>
         <Container>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h6" gutterBottom color="black" sx={{ fontWeight: 'bold' }}>
             의뢰 가능한 클라이언트
           </Typography>
           <Typography variant="body2" color="text.secondary" paragraph>
             아래 클라이언트 중 하나를 선택하여 의뢰를 받으세요. 각 클라이언트는 서로 다른 유형의 재무 분석 의뢰를 요청합니다.
           </Typography>
-          
-          <Divider sx={{ my: 3 }} />
           
           <Grid container spacing={3}>
             {availableClients.map((client) => {
@@ -123,6 +121,7 @@ const ClientSelectScreen: React.FC = () => {
                     display: 'flex', 
                     flexDirection: 'column',
                     transition: 'transform 0.2s',
+                    bgcolor: 'white',
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       boxShadow: 4
@@ -136,7 +135,7 @@ const ClientSelectScreen: React.FC = () => {
                           {typeInfo.icon}
                         </Avatar>
                         <Box>
-                          <Typography variant="h6" component="div">
+                          <Typography variant="h6" component="div" sx={{ color: '#000000 !important', fontWeight: 'bold' }}>
                             {client.name}
                           </Typography>
                           <Chip 

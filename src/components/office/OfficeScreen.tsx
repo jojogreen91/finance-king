@@ -39,15 +39,15 @@ import { CHARACTERS, ASSISTANT_DIALOGS } from '../../data/characters';
 
 // 사무실 업그레이드 비용 계산 함수
 const getUpgradeCost = (currentLevel: number): number => {
-  // 훨씬 높은 기본 비용으로 시작하며 더 빠르게 증가
+  // 매우 높은 기본 비용으로 시작하여 급격하게 증가
   const baseCosts = {
-    1: 300000,    // 레벨 1→2: 30만원
-    2: 750000,    // 레벨 2→3: 75만원 
-    3: 1500000,   // 레벨 3→4: 150만원
-    4: 3000000    // 레벨 4→5: 300만원
+    1: 1000000,    // 레벨 1→2: 100만원
+    2: 3000000,    // 레벨 2→3: 300만원 
+    3: 7500000,    // 레벨 3→4: 750만원
+    4: 15000000    // 레벨 4→5: 1500만원
   };
   
-  return baseCosts[currentLevel] || 5000000; // 기본값으로 500만원
+  return baseCosts[currentLevel] || 30000000; // 기본값으로 3000만원
 };
 
 const OfficeScreen: React.FC = () => {

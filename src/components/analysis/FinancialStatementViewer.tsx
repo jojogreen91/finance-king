@@ -44,13 +44,15 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-// 통화 형식 함수
+// 통화 형식 함수 (백만원 단위)
 function formatCurrency(value: number): string {
+  // 백만원 단위로 변환
+  const millionValue = value / 1000000;
   return new Intl.NumberFormat('ko-KR', { 
-    style: 'currency', 
-    currency: 'KRW',
-    maximumFractionDigits: 0
-  }).format(value);
+    style: 'decimal',
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0
+  }).format(millionValue);
 }
 
 // 비율 형식 함수
@@ -188,12 +190,12 @@ const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ com
       {/* 재무상태표 탭 */}
       <TabPanel value={tabValue} index={0}>
         <Typography variant="h6" gutterBottom>재무상태표</Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 440, overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto' }}>
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
                 <TableCell>항목</TableCell>
-                <TableCell align="right">금액 (원)</TableCell>
+                <TableCell align="right">금액 (백만원)</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -324,12 +326,12 @@ const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ com
       {/* 손익계산서 탭 */}
       <TabPanel value={tabValue} index={1}>
         <Typography variant="h6" gutterBottom>손익계산서</Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 440, overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto' }}>
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
                 <TableCell>항목</TableCell>
-                <TableCell align="right">금액 (원)</TableCell>
+                <TableCell align="right">금액 (백만원)</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -423,12 +425,12 @@ const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ com
       {/* 현금흐름표 탭 */}
       <TabPanel value={tabValue} index={2}>
         <Typography variant="h6" gutterBottom>현금흐름표</Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 440, overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto' }}>
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
                 <TableCell>항목</TableCell>
-                <TableCell align="right">금액 (원)</TableCell>
+                <TableCell align="right">금액 (백만원)</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -503,7 +505,7 @@ const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ com
       {/* 재무비율 탭 */}
       <TabPanel value={tabValue} index={3}>
         <Typography variant="h6" gutterBottom>재무비율</Typography>
-        <TableContainer component={Paper} sx={{ maxHeight: 440, overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 600, overflow: 'auto' }}>
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
@@ -607,59 +609,62 @@ const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ com
 
       {/* 시각화 탭 */}
       <TabPanel value={tabValue} index={4}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>재무상태표</Typography>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  자산, 부채, 자본 구성
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                {createAsciiBarChart(balanceSheetData)}
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>손익계산서</Typography>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  매출 및 이익 구성
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                {createAsciiBarChart(incomeStatementData)}
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>수익성 비율</Typography>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  수익성 지표 분석
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
-                  <Box sx={{ flex: 1 }}>
-                    {createAsciiBarChart(profitabilityData.map(item => ({ 
-                      ...item, 
-                      value: item.value * 100 
-                    })))}
+        <Typography variant="h6" gutterBottom>재무제표 시각화</Typography>
+        <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>재무상태표</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    자산, 부채, 자본 구성
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  {createAsciiBarChart(balanceSheetData)}
+                </CardContent>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>손익계산서</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    매출 및 이익 구성
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  {createAsciiBarChart(incomeStatementData)}
+                </CardContent>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>수익성 비율</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    수익성 지표 분석
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+                    <Box sx={{ flex: 1 }}>
+                      {createAsciiBarChart(profitabilityData.map(item => ({ 
+                        ...item, 
+                        value: item.value * 100 
+                      })))}
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      {createAsciiPieChart(profitabilityData.map(item => ({ 
+                        ...item, 
+                        value: item.value
+                      })))}
+                    </Box>
                   </Box>
-                  <Box sx={{ flex: 1 }}>
-                    {createAsciiPieChart(profitabilityData.map(item => ({ 
-                      ...item, 
-                      value: item.value
-                    })))}
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </TabPanel>
     </Box>
   );

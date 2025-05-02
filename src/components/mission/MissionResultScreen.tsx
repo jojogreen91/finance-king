@@ -384,17 +384,43 @@ const MissionResultScreen: React.FC = () => {
       <Dialog
         open={showExplanation}
         onClose={() => setShowExplanation(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
       >
-        <DialogTitle>정답 설명</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            {currentExplanation.explanation}
+        <DialogTitle>
+          <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center' }}>
+            <CheckCircleIcon color="success" sx={{ mr: 1 }} />
+            정답입니다! 상세 설명
           </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'success.light', color: 'success.contrastText', borderRadius: 1 }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              축하합니다! 정확한 재무 분석을 완료하셨습니다.
+            </Typography>
+            <Typography variant="body2">
+              아래에서 정답에 대한 상세한 설명과 계산 과정을 확인하실 수 있습니다.
+            </Typography>
+          </Box>
+          
+          <Typography variant="body1" sx={{ mb: 2, fontWeight: 'bold' }}>
+            계산 방법 및 해설:
+          </Typography>
+          
+          <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+            <Typography variant="body1" component="div" sx={{ whiteSpace: 'pre-line' }}>
+              {currentExplanation.explanation}
+            </Typography>
+          </Paper>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowExplanation(false)}>닫기</Button>
+          <Button 
+            onClick={() => setShowExplanation(false)} 
+            variant="contained" 
+            color="primary"
+          >
+            확인했습니다
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
